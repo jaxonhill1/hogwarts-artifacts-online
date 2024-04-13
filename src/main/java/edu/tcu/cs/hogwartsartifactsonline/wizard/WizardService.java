@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
+
 @Service
 @Transactional
 public class WizardService {
@@ -19,7 +21,7 @@ public class WizardService {
     
     public Wizard findById(Integer wizardId) {
         return this.wizardRepository.findById(wizardId)
-            .orElseThrow(() -> new WizardNotFoundException(wizardId));
+            .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
     }
 
     public Wizard save(Wizard newWizard) { return this.wizardRepository.save(newWizard); }
@@ -30,12 +32,12 @@ public class WizardService {
                 oldWizard.setName(update.getName());
                 return this.wizardRepository.save(oldWizard);
             })
-            .orElseThrow(() -> new WizardNotFoundException(wizardId));
+            .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
     }
 
     public void delete(Integer wizardId) {
         Wizard wizardToBeDeleted = this.wizardRepository.findById(wizardId)
-            .orElseThrow(() -> new WizardNotFoundException(wizardId));
+            .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
 
         // pre-deletion, we unassign owned artifacts
         wizardToBeDeleted.removeAllArtifact();
