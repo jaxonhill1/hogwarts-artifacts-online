@@ -12,19 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/wizards")
+@RequestMapping("${api.endpoint.base-url}/wizards")
 public class WizardController {
-
     private final WizardService wizardService;
-    private final WizardDtoToWizardConverter wizardDtoToWizardConverter;
     private final WizardToWizardDtoConverter wizardToWizardDtoConverter;
+    private final WizardDtoToWizardConverter wizardDtoToWizardConverter;
 
-    public WizardController(WizardService wizardService, WizardDtoToWizardConverter wizardDtoToWizardConverter, WizardToWizardDtoConverter wizardToWizardDtoConverter) {
+    public WizardController(WizardService wizardService, WizardToWizardDtoConverter wizardToWizardDtoConverter, WizardDtoToWizardConverter wizardDtoToWizardConverter) {
         this.wizardService = wizardService;
-        this.wizardDtoToWizardConverter = wizardDtoToWizardConverter;
         this.wizardToWizardDtoConverter = wizardToWizardDtoConverter;
+        this.wizardDtoToWizardConverter = wizardDtoToWizardConverter;
     }
-
     @GetMapping
     public Result findAllWizards(){
         List<Wizard> foundWizards = this.wizardService.findAll();
@@ -65,11 +63,9 @@ public class WizardController {
         return new Result(true, StatusCode.SUCCESS, "Delete Success");
     }
 
-    // @PutMapping("/{wizardId}/artifacts/{artifactId}")
-    // public Result assignArtifactToWizard(@PathVariable Integer wizardId, @PathVariable String artifactId) {
-    //     this.wizardService.assignArtifactToWizard(wizardId, artifactId);
-    //     return new Result(true, StatusCode.SUCCESS, "Artifact Assignment Success");
-    // }
-
-    
+    @PutMapping("/{wizardId}/artifacts/{artifactId}")
+    public Result assignArtifactToWizard(@PathVariable Integer wizardId, @PathVariable String artifactId) {
+        this.wizardService.assignArtifactToWizard(wizardId, artifactId);
+        return new Result(true, StatusCode.SUCCESS, "Artifact Assignment Success");
+    }
 }

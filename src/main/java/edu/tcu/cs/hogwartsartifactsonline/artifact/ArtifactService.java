@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwartsartifactsonline.artifact;
 
 import edu.tcu.cs.hogwartsartifactsonline.artifact.utils.IdWorker;
+import edu.tcu.cs.hogwartsartifactsonline.system.Result;
 import edu.tcu.cs.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -8,56 +9,50 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Transactional //each method has own transaction
+@Transactional
 public class ArtifactService {
-
     private final ArtifactRepository artifactRepository;
     private final IdWorker idWorker;
 
-    //Constructor
+    // constructor injection
     public ArtifactService(ArtifactRepository artifactRepository, IdWorker idWorker) {
         this.artifactRepository = artifactRepository;
         this.idWorker = idWorker;
     }
 
-    public Artifact findById(String artifactId){
-        return this.artifactRepository.findById(artifactId) //return if found
-                .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId)); //throw exception if not found
+    public Artifact findById(String artifactId) {
+        return this.artifactRepository.findById(artifactId)
+                .orElseThrow(()->new ObjectNotFoundException("artifact", artifactId));
     }
 
-
-    //returns an empty list if no artifact is present. due to the artifact List declaration, we avoid null pointer error
-    public List<Artifact> findAll(){
+    public List<Artifact> findAll() {
         return this.artifactRepository.findAll();
     }
 
-    public Artifact save(Artifact newArtifact){
+    public Artifact save(Artifact newArtifact) {
         newArtifact.setId(idWorker.nextId() + "");
         return this.artifactRepository.save(newArtifact);
-
     }
 
-    public Artifact update(String artifactId, Artifact update){
-            return this.artifactRepository.findById(artifactId)
-                .map(oldArtifact ->{ //if found, run the below
-                    oldArtifact.setName(update.getName());
-                    oldArtifact.setDescription((update.getDescription()));
-                    oldArtifact.setImageUrl(update.getImageUrl());
+    public Artifact update(String artifactId, Artifact updateArtifact) {
+        return this.artifactRepository.findById(artifactId)
+                .map(oldArtifact -> {
+                    oldArtifact.setName(updateArtifact.getName());
+                    oldArtifact.setDescription(updateArtifact.getDescription());
+                    oldArtifact.setImgUrl(updateArtifact.getImgUrl());
+                    // save is smart. if the id exists, it will update
+                    // otherwise, it will create the new artifact
                     return this.artifactRepository.save(oldArtifact);
                 })
-                .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId)); //if not found, throw exception
+                .orElseThrow(()-> new ObjectNotFoundException("artifact", artifactId));
 
 
 
     }
-
-    public void delete(String artifactId){
-        this.artifactRepository.findById(artifactId)
+    public void delete(String artifactId) {
+        Artifact foundArtifact = this.artifactRepository.findById(artifactId)
                 .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
+
         this.artifactRepository.deleteById(artifactId);
-
-
     }
-
-
 }

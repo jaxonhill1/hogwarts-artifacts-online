@@ -1,12 +1,7 @@
 package edu.tcu.cs.hogwartsartifactsonline.wizard;
 
 import edu.tcu.cs.hogwartsartifactsonline.artifact.Artifact;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,16 +9,16 @@ import java.util.List;
 
 @Entity
 public class Wizard implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String name;
 
-    //Wizard giving up maintaining artifacts. Many side is responsible for storing artifacts
-    //if we save one wizard in the database using WizzRepository, all associating artifacts will be saved too
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "owner")  //one wizard has many artifacts
-    private List<Artifact> artifacts = new ArrayList<>(); //starting with an empty list upon initialization
+    // owner field in Artifact is responsible for foreign key
+    // cascade: if we save 1 wizard in db, all artifacts will be saved too.
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy =  "owner")
+    private List<Artifact> artifacts = new ArrayList<>();
 
     public Wizard() {
     }
@@ -52,11 +47,8 @@ public class Wizard implements Serializable {
         this.artifacts = artifacts;
     }
 
-    //establishing bidirectional relationship btwn artifacts and wizards
     public void addArtifact(Artifact artifact) {
-        //set owner
         artifact.setOwner(this);
-        //add to wizard's ownership field
         this.artifacts.add(artifact);
     }
 
@@ -64,8 +56,19 @@ public class Wizard implements Serializable {
         return this.artifacts.size();
     }
 
-    public void removeAllArtifact() {
+    public void removeAllArtifacts(){
         this.artifacts.stream().forEach(artifact -> artifact.setOwner(null));
-        this.artifacts = null;
+        this.artifacts = new ArrayList<>();
+    }
+
+    public void addNewArtifact(Artifact artifact) {
+        this.artifacts.add(artifact);
+        artifact.setOwner(this);
+    }
+
+    public void removeArtifact(Artifact artifactToBeAssigned) {
+        // Remove artifact owner
+        artifactToBeAssigned.setOwner(null);
+        this.artifacts.remove(artifactToBeAssigned);
     }
 }

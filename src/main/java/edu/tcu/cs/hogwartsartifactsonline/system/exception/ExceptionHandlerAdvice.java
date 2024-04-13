@@ -1,7 +1,7 @@
 package edu.tcu.cs.hogwartsartifactsonline.system.exception;
 
-import edu.tcu.cs.hogwartsartifactsonline.system.*;
-
+import edu.tcu.cs.hogwartsartifactsonline.system.Result;
+import edu.tcu.cs.hogwartsartifactsonline.system.StatusCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -16,19 +16,16 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class ExceptionHandlerAdvice {
-    @ExceptionHandler({ObjectNotFoundException.class}) //tells Spring this method is exception handler for this class
-    @ResponseStatus(HttpStatus.NOT_FOUND) //returns in header
-    //customized return, great for if company has own codes
-    Result handleArtifactOrWizardNotFoundException(Exception ex){
-        return new Result(false, StatusCode.NOT_FOUND, ex.getMessage()); //serialized into JSON String
 
+    @ExceptionHandler({ObjectNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    Result handleObjectNotFoundException(ObjectNotFoundException ex) {
+        return new Result(false, StatusCode.NOT_FOUND, ex.getMessage());
     }
 
-    /**
-     * This handles invalid inputs.
+    /*
+     * This handles invalid inputs
      *
-     * @param ex
-     * @return
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -40,6 +37,9 @@ public class ExceptionHandlerAdvice {
             String val = error.getDefaultMessage();
             map.put(key, val);
         });
-        return new Result(false, StatusCode.INVALID_ARGUMENT, "Provided arguments are invalid, see data for details.", map);
+        return new Result(false,
+                StatusCode.INVALID_ARGUMENT,
+                "Provided arguments is invalid, see data for details",
+                map);
     }
 }
