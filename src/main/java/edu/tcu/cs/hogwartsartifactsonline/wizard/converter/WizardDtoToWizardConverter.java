@@ -6,8 +6,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WizardDtoToWizardConverter implements Converter<WizardDto, Wizard>{
-    
+public class WizardDtoToWizardConverter implements Converter<WizardDto, Wizard> {
 
     @Override
     public Wizard convert(WizardDto source) {
