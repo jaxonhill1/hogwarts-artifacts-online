@@ -10,17 +10,22 @@ import java.io.Serializable;
 
 @Entity
 public class HogwartsUser implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     @NotEmpty(message = "username is required.")
     private String username;
+
     @NotEmpty(message = "password is required.")
     private String password;
+
     private boolean enabled;
+
     @NotEmpty(message = "roles are required.")
-    private String roles; // space separated string
+    private String roles; // Space separated string like "admin user" to indicate they have both roles
+
 
     public HogwartsUser() {
     }
@@ -64,4 +69,5 @@ public class HogwartsUser implements Serializable {
     public void setRoles(String roles) {
         this.roles = roles;
     }
+
 }

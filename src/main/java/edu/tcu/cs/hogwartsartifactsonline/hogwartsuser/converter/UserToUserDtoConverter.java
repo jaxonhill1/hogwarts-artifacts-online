@@ -7,9 +7,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserToUserDtoConverter implements Converter<HogwartsUser, UserDto> {
+
     @Override
     public UserDto convert(HogwartsUser source) {
-        UserDto userDto = new UserDto(source.getId(), source.getUsername(), source.isEnabled(), source.getRoles());
+        // We are not setting password in DTO.
+        final UserDto userDto = new UserDto(source.getId(),
+                source.getUsername(),
+                source.isEnabled(),
+                source.getRoles());
         return userDto;
     }
+
 }

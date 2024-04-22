@@ -98,7 +98,7 @@ class ArtifactServiceTest {
 
         //When
          Throwable thrown = catchThrowable(()->{
-            Artifact returnedArtifact = artifactService.findById("1250808601744904192");
+            Artifact returnedArtifact = this.artifactService.findById("1250808601744904192");
          });
         //Then
         assertThat(thrown)
@@ -113,7 +113,7 @@ class ArtifactServiceTest {
         given(this.artifactRepository.findAll()).willReturn(this.artifacts);
 
         //When
-        List<Artifact> actualArtifacts = artifactService.findAll();
+        List<Artifact> actualArtifacts = this.artifactService.findAll();
 
         //Then
         assertThat(actualArtifacts.size()).isEqualTo(this.artifacts.size());
@@ -128,11 +128,11 @@ class ArtifactServiceTest {
         newArtifact.setDescription("Description..");
         newArtifact.setImageUrl("ImageUrl...");
 
-        given(idWorker.nextId()).willReturn(123456L);
+        given(this.idWorker.nextId()).willReturn(123456L);
         given(this.artifactRepository.save(newArtifact)).willReturn(newArtifact);
 
         //When
-        Artifact savedArtifact = artifactService.save(newArtifact);
+        Artifact savedArtifact = this.artifactService.save(newArtifact);
 
         //Then
         assertThat(savedArtifact.getId()).isEqualTo("123456");
@@ -152,16 +152,17 @@ class ArtifactServiceTest {
         oldArtifact.setImageUrl("ImageUrl");
 
         Artifact update = new Artifact();
-        // update.setId("1250808601744904192");
+//        update.setId("1250808601744904192"); removed because front end can't send ID in request body
         update.setName("Invisibility Cloak");
         update.setDescription("A new description.");
         update.setImageUrl("ImageUrl");
 
+        //first find, then save the modified version
         given(this.artifactRepository.findById("1250808601744904192")).willReturn(Optional.of(oldArtifact));
         given(this.artifactRepository.save(oldArtifact)).willReturn(oldArtifact); //retuning with updated value
 
         //When
-        Artifact updatedArtifact = artifactService.update("1250808601744904192", update);
+        Artifact updatedArtifact = this.artifactService.update("1250808601744904192", update);
 
         //Then
         assertThat(updatedArtifact.getId()).isEqualTo("1250808601744904192");
@@ -183,7 +184,7 @@ class ArtifactServiceTest {
 
         //When. We are expecting an exception is thrown. if not, this testcase fails.
         assertThrows(ObjectNotFoundException.class, ()->{
-            artifactService.update("1250808601744904192", update);
+            this.artifactService.update("1250808601744904192", update);
         });
 
         //Then
@@ -204,7 +205,7 @@ class ArtifactServiceTest {
         doNothing().when(this.artifactRepository).deleteById("1250808601744904192");
 
         //When
-        artifactService.delete("1250808601744904192");
+        this.artifactService.delete("1250808601744904192");
 
         //Then
         verify(this.artifactRepository, times(1)).deleteById("1250808601744904192");
@@ -219,7 +220,7 @@ class ArtifactServiceTest {
 
         //When
         assertThrows(ObjectNotFoundException.class, () ->{
-            artifactService.delete("1250808601744904192");
+            this.artifactService.delete("1250808601744904192");
         });
 
         //Then

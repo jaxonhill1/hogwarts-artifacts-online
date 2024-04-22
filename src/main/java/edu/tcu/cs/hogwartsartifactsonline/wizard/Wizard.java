@@ -10,15 +10,15 @@ import java.util.List;
 @Entity
 public class Wizard implements Serializable {
 
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String name;
 
-    // owner field in Artifact is responsible for foreign key
-    // cascade: if we save 1 wizard in db, all artifacts will be saved too.
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy =  "owner")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "owner")
     private List<Artifact> artifacts = new ArrayList<>();
+
 
     public Wizard() {
     }
@@ -56,19 +56,15 @@ public class Wizard implements Serializable {
         return this.artifacts.size();
     }
 
-    public void removeAllArtifacts(){
+    public void removeAllArtifacts() {
         this.artifacts.stream().forEach(artifact -> artifact.setOwner(null));
         this.artifacts = new ArrayList<>();
     }
 
-    public void addNewArtifact(Artifact artifact) {
-        this.artifacts.add(artifact);
-        artifact.setOwner(this);
-    }
-
     public void removeArtifact(Artifact artifactToBeAssigned) {
-        // Remove artifact owner
+        // Remove artifact owner.
         artifactToBeAssigned.setOwner(null);
         this.artifacts.remove(artifactToBeAssigned);
     }
+
 }

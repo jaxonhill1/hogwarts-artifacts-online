@@ -5,13 +5,14 @@ import edu.tcu.cs.hogwartsartifactsonline.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 @Transactional
 public class WizardService {
+
     private final WizardRepository wizardRepository;
+
     private final ArtifactRepository artifactRepository;
 
     public WizardService(WizardRepository wizardRepository, ArtifactRepository artifactRepository) {
@@ -19,47 +20,55 @@ public class WizardService {
         this.artifactRepository = artifactRepository;
     }
 
-    public List<Wizard> findAll(){
+    public List<Wizard> findAll() {
         return this.wizardRepository.findAll();
     }
+
     public Wizard findById(Integer wizardId) {
         return this.wizardRepository.findById(wizardId)
-                .orElseThrow(()-> new ObjectNotFoundException("wizard", wizardId));
+                .orElseThrow(() -> new ObjectNotFoundException("wizard",wizardId));
     }
 
     public Wizard save(Wizard newWizard) {
         return this.wizardRepository.save(newWizard);
     }
 
-    public Wizard update(Integer wizardId, Wizard updateWizard) {
+    // We are not updating a wizard's artifacts through this method, we only update their name.
+    public Wizard update(Integer wizardId, Wizard update) {
         return this.wizardRepository.findById(wizardId)
                 .map(oldWizard -> {
-                    oldWizard.setName(updateWizard.getName());
-
+                    oldWizard.setName(update.getName());
                     return this.wizardRepository.save(oldWizard);
-                }).orElseThrow(()-> new ObjectNotFoundException("wizard", wizardId));
-    }
-    public void delete(Integer wizardId) {
-        // Make sure we have valid wizardId
-        Wizard wizardToBeDeleted = this.wizardRepository.findById(wizardId)
+                })
                 .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
+    }
 
+    public void delete(Integer wizardId) {
+        Wizard wizardToBeDeleted = this.wizardRepository.findById(wizardId)
+                .orElseThrow(() -> new ObjectNotFoundException("wizard",wizardId));
+
+        // Before deletion, we will unassign this wizard's owned artifacts.
         wizardToBeDeleted.removeAllArtifacts();
-
         this.wizardRepository.deleteById(wizardId);
     }
-    public void assignArtifactToWizard(Integer wizardId, String artifactId) {
+
+    public void assignArtifact(Integer wizardId, String artifactId){
+        // Find this artifact by Id from DB.
+        Artifact artifactToBeAssigned = this.artifactRepository.findById(artifactId)
+                .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
+
+        // Find this wizard by Id from DB.
         Wizard wizard = this.wizardRepository.findById(wizardId)
                 .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
 
-        Artifact artifactToBeAssigned = this.artifactRepository.findById(artifactId)
-                .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
-
-        // We need to see if artifact is already owned by some wizard
+        // Artifact assignment
+        // We need to see if the artifact is already owned by some wizard.
         if (artifactToBeAssigned.getOwner() != null) {
             artifactToBeAssigned.getOwner().removeArtifact(artifactToBeAssigned);
         }
-
-        wizard.addNewArtifact(artifactToBeAssigned);
+        wizard.addArtifact(artifactToBeAssigned);
     }
+
+
+
 }
