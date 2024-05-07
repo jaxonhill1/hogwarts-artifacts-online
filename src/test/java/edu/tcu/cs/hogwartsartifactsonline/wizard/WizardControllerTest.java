@@ -1,3 +1,4 @@
+
 package edu.tcu.cs.hogwartsartifactsonline.wizard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,9 +9,7 @@ import edu.tcu.cs.hogwartsartifactsonline.wizard.dto.WizardDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles(value = "dev")
 class WizardControllerTest {
 
     @Autowired
@@ -48,43 +48,44 @@ class WizardControllerTest {
     @Value("${api.endpoint.base-url}")
     String baseUrl;
 
+
     @BeforeEach
     void setUp() throws Exception {
         Artifact a1 = new Artifact();
         a1.setId("1250808601744904191");
         a1.setName("Deluminator");
         a1.setDescription("A Deluminator is a device invented by Albus Dumbledore that resembles a cigarette lighter. It is used to remove or absorb (as well as return) the light from any light source to provide cover to the user.");
-        a1.setImageUrl("ImageUrl");
+        a1.setImageURL("ImageUrl");
 
         Artifact a2 = new Artifact();
         a2.setId("1250808601744904192");
         a2.setName("Invisibility Cloak");
         a2.setDescription("An invisibility cloak is used to make the wearer invisible.");
-        a2.setImageUrl("ImageUrl");
+        a2.setImageURL("ImageUrl");
 
         Artifact a3 = new Artifact();
         a3.setId("1250808601744904193");
         a3.setName("Elder Wand");
         a3.setDescription("The Elder Wand, known throughout history as the Deathstick or the Wand of Destiny, is an extremely powerful wand made of elder wood with a core of Thestral tail hair.");
-        a3.setImageUrl("ImageUrl");
+        a3.setImageURL("ImageUrl");
 
         Artifact a4 = new Artifact();
         a4.setId("1250808601744904194");
         a4.setName("The Marauder's Map");
         a4.setDescription("A magical map of Hogwarts created by Remus Lupin, Peter Pettigrew, Sirius Black, and James Potter while they were students at Hogwarts.");
-        a4.setImageUrl("ImageUrl");
+        a4.setImageURL("ImageUrl");
 
         Artifact a5 = new Artifact();
         a5.setId("1250808601744904195");
         a5.setName("The Sword Of Gryffindor");
         a5.setDescription("A goblin-made sword adorned with large rubies on the pommel. It was once owned by Godric Gryffindor, one of the medieval founders of Hogwarts.");
-        a5.setImageUrl("ImageUrl");
+        a5.setImageURL("ImageUrl");
 
         Artifact a6 = new Artifact();
         a6.setId("1250808601744904196");
         a6.setName("Resurrection Stone");
         a6.setDescription("The Resurrection Stone allows the holder to bring back deceased loved ones, in a semi-physical form, and communicate with them.");
-        a6.setImageUrl("ImageUrl");
+        a6.setImageURL("ImageUrl");
 
         this.wizards = new ArrayList<>();
 
@@ -115,7 +116,7 @@ class WizardControllerTest {
         given(this.wizardService.findAll()).willReturn(this.wizards);
 
         // When and then
-        this.mockMvc.perform(get("/api/v1//wizards").accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(get(this.baseUrl + "/wizards").accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
                 .andExpect(jsonPath("$.message").value("Find All Success"))
@@ -132,7 +133,7 @@ class WizardControllerTest {
         given(this.wizardService.findById(1)).willReturn(this.wizards.get(0));
 
         // When and then
-        this.mockMvc.perform(get("/api/v1/wizards/1").accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(get(this.baseUrl + "/wizards/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
                 .andExpect(jsonPath("$.message").value("Find One Success"))
@@ -146,7 +147,7 @@ class WizardControllerTest {
         given(this.wizardService.findById(5)).willThrow(new ObjectNotFoundException("wizard", 5));
 
         // When and then
-        this.mockMvc.perform(get("/api/v1//wizards/5").accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(get(this.baseUrl + "/wizards/5").accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
                 .andExpect(jsonPath("$.message").value("Could not find wizard with Id 5 :("))
@@ -167,7 +168,7 @@ class WizardControllerTest {
         given(this.wizardService.save(Mockito.any(Wizard.class))).willReturn(savedWizard);
 
         // When and then
-        this.mockMvc.perform(post("/api/v1//wizards").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post(this.baseUrl + "/wizards").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
                 .andExpect(jsonPath("$.message").value("Add Success"))
@@ -189,7 +190,7 @@ class WizardControllerTest {
         given(this.wizardService.update(eq(1), Mockito.any(Wizard.class))).willReturn(updatedWizard);
 
         // When and then
-        this.mockMvc.perform(put("/api/v1//wizards/1").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(put(this.baseUrl + "/wizards/1").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
                 .andExpect(jsonPath("$.message").value("Update Success"))
@@ -209,15 +210,42 @@ class WizardControllerTest {
         String json = this.objectMapper.writeValueAsString(wizardDto);
 
         // When and then
-        this.mockMvc.perform(put("/api/v1//wizards/5").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(put(this.baseUrl + "/wizards/5").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
                 .andExpect(jsonPath("$.message").value("Could not find wizard with Id 5 :("))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
+
+    @Test
+    void testDeleteWizardSuccess() throws Exception {
+        // Given. Arrange inputs and targets. Define the behavior of Mock object wizardService.
+        doNothing().when(this.wizardService).delete(3);
+
+        // When and then
+        this.mockMvc.perform(delete(this.baseUrl + "/wizards/3").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Delete Success"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void testDeleteWizardErrorWithNonExistentId() throws Exception {
+        // Given. Arrange inputs and targets. Define the behavior of Mock object wizardService.
+        doThrow(new ObjectNotFoundException("wizard", 5)).when(this.wizardService).delete(5);
+
+        // When and then
+        this.mockMvc.perform(delete(this.baseUrl + "/wizards/5").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find wizard with Id 5 :("))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
     @Test
     void testAssignArtifactSuccess() throws Exception {
-        // Given - this is the happy path. no news is good news
+        // Given
         doNothing().when(this.wizardService).assignArtifact(2, "1250808601744904191");
 
         // When and then
@@ -240,6 +268,7 @@ class WizardControllerTest {
                 .andExpect(jsonPath("$.message").value("Could not find wizard with Id 5 :("))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
+
     @Test
     void testAssignArtifactErrorWithNonExistentArtifactId() throws Exception {
         // Given
@@ -252,4 +281,5 @@ class WizardControllerTest {
                 .andExpect(jsonPath("$.message").value("Could not find artifact with Id 1250808601744904199 :("))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
+
 }

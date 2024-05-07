@@ -1,3 +1,4 @@
+
 package edu.tcu.cs.hogwartsartifactsonline.wizard;
 
 import edu.tcu.cs.hogwartsartifactsonline.artifact.Artifact;
@@ -24,6 +25,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles(value = "dev")
 class WizardServiceTest {
 
     @Mock
@@ -34,7 +36,6 @@ class WizardServiceTest {
 
     @InjectMocks
     WizardService wizardService;
-
 
     List<Wizard> wizards;
 
@@ -207,7 +208,7 @@ class WizardServiceTest {
         a.setId("1250808601744904192");
         a.setName("Invisibility Cloak");
         a.setDescription("An invisibility cloak is used to make the wearer invisible.");
-        a.setImageUrl("ImageUrl");
+        a.setImageURL("ImageUrl");
 
         Wizard w2 = new Wizard();
         w2.setId(2);
@@ -218,14 +219,14 @@ class WizardServiceTest {
         w3.setId(3);
         w3.setName("Neville Longbottom");
 
-        given(this.artifactRepository.findById("1250808601744904192")).willReturn(Optional.of(a)); //if artifact exists
-        given(this.wizardRepository.findById(3)).willReturn(Optional.of(w3)); //if wizard exists
+        given(this.artifactRepository.findById("1250808601744904192")).willReturn(Optional.of(a));
+        given(this.wizardRepository.findById(3)).willReturn(Optional.of(w3));
 
         // When
         this.wizardService.assignArtifact(3, "1250808601744904192");
 
         // Then
-        assertThat(a.getOwner().getId()).isEqualTo(3); //assigned to Neville, not Harry (2)
+        assertThat(a.getOwner().getId()).isEqualTo(3);
         assertThat(w3.getArtifacts()).contains(a);
     }
 
@@ -236,7 +237,7 @@ class WizardServiceTest {
         a.setId("1250808601744904192");
         a.setName("Invisibility Cloak");
         a.setDescription("An invisibility cloak is used to make the wearer invisible.");
-        a.setImageUrl("ImageUrl");
+        a.setImageURL("ImageUrl");
 
         Wizard w2 = new Wizard();
         w2.setId(2);
@@ -255,7 +256,7 @@ class WizardServiceTest {
         assertThat(thrown)
                 .isInstanceOf(ObjectNotFoundException.class)
                 .hasMessage("Could not find wizard with Id 3 :(");
-        assertThat(a.getOwner().getId()).isEqualTo(2); //ownership didnt change bc this failed
+        assertThat(a.getOwner().getId()).isEqualTo(2);
     }
 
     @Test
@@ -273,4 +274,5 @@ class WizardServiceTest {
                 .isInstanceOf(ObjectNotFoundException.class)
                 .hasMessage("Could not find artifact with Id 1250808601744904192 :(");
     }
+
 }
