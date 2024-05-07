@@ -4,7 +4,7 @@ public class StatusCode {
 
     public static final int SUCCESS = 200; // Success
 
-    public static final int INVALID_ARGUMENT = 400; // Bad request, e.g., invalid parameters
+    public static final int INVALID_ARGUMENT = 400; // Bad request
 
     public static final int UNAUTHORIZED = 401; // Username or password incorrect
 

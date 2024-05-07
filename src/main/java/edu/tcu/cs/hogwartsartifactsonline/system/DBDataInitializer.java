@@ -7,16 +7,18 @@ import edu.tcu.cs.hogwartsartifactsonline.hogwartsuser.UserService;
 import edu.tcu.cs.hogwartsartifactsonline.wizard.Wizard;
 import edu.tcu.cs.hogwartsartifactsonline.wizard.WizardRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Component //now a bean of SB like Controller, Serice, and Repository
+@Component
+@Profile("dev") //Only intializes if application.yml is dev
 public class DBDataInitializer implements CommandLineRunner {
 
     private final ArtifactRepository artifactRepository;
     private final WizardRepository wizardRepository;
     private final UserService userService;
 
-    //using constructor to inject repositories into class
+   
 
     public DBDataInitializer(ArtifactRepository artifactRepository, WizardRepository wizardRepository, UserService userService) {
         this.artifactRepository = artifactRepository;
@@ -25,7 +27,7 @@ public class DBDataInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception { //gets called when SP starts, so duh we'll put testing data here
+    public void run(String... args) throws Exception { 
         Artifact a1 = new Artifact();
         a1.setId("1250808601744904191");
         a1.setName("Deluminator");
